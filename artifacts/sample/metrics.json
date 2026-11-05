@@ -1,0 +1,81 @@
+{
+  "psnr_db": 72.53592016359407,
+  "psnr_infinite": false,
+  "ssim": 0.9999920923183051,
+  "mse": 0.0036265055338541665,
+  "width": 256,
+  "height": 256,
+  "channels": 3,
+  "changed_channels": 713,
+  "changed_channel_ratio": 0.0036265055338541665,
+  "ssim_window_size": 7,
+  "chi_square": {
+    "method": "paired-value-pearson-full-image-rgb",
+    "formula": "sum((count_even - count_odd)^2 / (count_even + count_odd))",
+    "interpretation": "Exploratory paired-value histogram heuristic; a p-value is not the probability of hidden data and does not establish steganographic or cryptographic security. Full-image histograms can dilute localized embedding, and natural images can produce similar distributions. Sparse pair counts weaken the asymptotic chi-square approximation.",
+    "original": {
+      "red": {
+        "statistic": 155.19142728180375,
+        "degrees_of_freedom": 78,
+        "p_value": 4.770594926261363e-07,
+        "sample_count": 65536,
+        "nonempty_pairs": 78,
+        "pairs_with_expected_count_below_5": 0,
+        "even_count": 32946,
+        "odd_count": 32590
+      },
+      "green": {
+        "statistic": 183.15841434773625,
+        "degrees_of_freedom": 68,
+        "p_value": 1.6533524864783544e-12,
+        "sample_count": 65536,
+        "nonempty_pairs": 68,
+        "pairs_with_expected_count_below_5": 0,
+        "even_count": 32736,
+        "odd_count": 32800
+      },
+      "blue": {
+        "statistic": 57.279301670463326,
+        "degrees_of_freedom": 53,
+        "p_value": 0.3194126875970039,
+        "sample_count": 65536,
+        "nonempty_pairs": 53,
+        "pairs_with_expected_count_below_5": 2,
+        "even_count": 32742,
+        "odd_count": 32794
+      }
+    },
+    "stego": {
+      "red": {
+        "statistic": 159.78119669068374,
+        "degrees_of_freedom": 78,
+        "p_value": 1.419260580821798e-07,
+        "sample_count": 65536,
+        "nonempty_pairs": 78,
+        "pairs_with_expected_count_below_5": 0,
+        "even_count": 32938,
+        "odd_count": 32598
+      },
+      "green": {
+        "statistic": 126.06810143403183,
+        "degrees_of_freedom": 68,
+        "p_value": 2.398946755699478e-05,
+        "sample_count": 65536,
+        "nonempty_pairs": 68,
+        "pairs_with_expected_count_below_5": 0,
+        "even_count": 32796,
+        "odd_count": 32740
+      },
+      "blue": {
+        "statistic": 61.38476993442931,
+        "degrees_of_freedom": 53,
+        "p_value": 0.20072713636905,
+        "sample_count": 65536,
+        "nonempty_pairs": 53,
+        "pairs_with_expected_count_below_5": 2,
+        "even_count": 32731,
+        "odd_count": 32805
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "artifact_type": "synthetic-demonstration-no-physical-measurements",
+  "seed": 252,
+  "dimensions": [
+    256,
+    256
+  ],
+  "generator": "RGB linear gradients + seeded integer texture [-7,7], clipped to uint8",
+  "message_utf8": "Mesaj sintetic de test: criptarea mesajelor în imagini. Echipa Meriacre Victor, Parfeni Inga, Rudinciuc Victor — SI-252, UTM.",
+  "message_bytes": 128,
+  "public_test_password": "Synthetic sample password 2026!",
+  "warning": "Public test data and public password for reproducibility only. Never use this password for actual secrets. Cryptographic salt and IV are OS-random so the stego file is not deterministic.",
+  "original": "synthetic_original.png",
+  "stego": "synthetic_stego.png"
+}

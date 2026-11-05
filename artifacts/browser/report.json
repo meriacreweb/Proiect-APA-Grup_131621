@@ -1,0 +1,26 @@
+{
+  "status": "passed",
+  "browser": "153.0.8010.12",
+  "url": "http://127.0.0.1:8000",
+  "checks": [
+    "desktop layout",
+    "upload",
+    "UTF-8 capacity",
+    "AES-GCM embedding",
+    "PNG download",
+    "PSNR/SSIM analysis",
+    "wrong password rejection",
+    "authenticated extraction",
+    "literal HTML rendering",
+    "clear secret",
+    "390px mobile without overflow",
+    "clear session",
+    "no web storage",
+    "no external requests",
+    "no JavaScript errors"
+  ],
+  "input_type": "public synthetic test image and public test message",
+  "message_bytes": 64,
+  "page_errors": [],
+  "external_requests": []
+}
