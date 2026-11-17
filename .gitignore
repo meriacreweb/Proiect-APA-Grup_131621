@@ -6,4 +6,7 @@ __pycache__/
 .env
 *.log
 analysis/
+node_modules/
+dist/
+.netlify/
 

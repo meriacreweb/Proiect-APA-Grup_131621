@@ -3,41 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <meta name="theme-color" content="#f7f6f2">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#151618">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="description" content="Ascunde și recuperează mesaje criptate în imagini PNG sau BMP.">
   <title>StegVault — Criptarea mesajelor în imagini</title>
   <link rel="icon" href="/mark.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/styles.css?v=2">
-  <script src="/app.js?v=2" defer></script>
+  <link rel="stylesheet" href="/styles.css?v=3">
+  <script src="/app.js?v=3" defer></script>
 </head>
 <body>
-  <svg class="icon-definitions" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
-    <symbol id="i-mark" viewBox="0 0 24 24"><path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z"/><path fill="currentColor" stroke="none" d="M13 13h7v7h-7z"/></symbol>
-    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="m3 16 5-5 4 4 3-3 6 6"/><circle cx="15.5" cy="8.5" r="1.25"/></symbol>
-    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m-4 4 4-4 4 4M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></symbol>
-    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
-    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12m-4-4 4 4 4-4M4 17v3h16v-3"/></symbol>
-    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12s3.5-6.5 9.5-6.5 9.5 6.5 9.5 6.5-3.5 6.5-9.5 6.5S2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.5"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="1.5"/><path d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></symbol>
-    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
-    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
-    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
-  </svg>
-
   <a class="skip-link" href="#main">Sari la conținut</a>
   <header class="site-header">
     <div class="page-width topbar">
       <a class="brand" href="/" aria-label="StegVault, pagina principală">
-        <span class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-mark"/></svg></span>
+        <img class="brand-mark" src="/mark.svg" width="30" height="30" alt="">
         <span>StegVault</span>
       </a>
       <div class="header-actions">
         <span class="project-label">UTM / SI-252</span>
-        <button class="button reset-button" id="clear-session" type="button">
-          <svg class="icon" aria-hidden="true"><use href="#i-x"/></svg> Golește sesiunea
-        </button>
+        <button class="button reset-button" id="clear-session" type="button">Golește sesiunea</button>
       </div>
     </div>
   </header>
@@ -45,7 +30,7 @@
   <main class="page-width" id="main" tabindex="-1">
     <div class="page-title">
       <h1>Criptarea mesajelor în imagini</h1>
-      <p>Ascunde text într-un fișier PNG sau recuperează un mesaj cu parola lui.</p>
+      <p>Criptează și ascunde text într-o imagine sau recuperează mesajul cu parola lui.</p>
     </div>
 
     <div class="workspace-nav">
@@ -53,11 +38,11 @@
         <button id="tab-embed" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-embed" tabindex="0">Ascunde un mesaj</button>
         <button id="tab-extract" class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel-extract" tabindex="-1">Extrage un mesaj</button>
       </div>
-      <span class="format-note">PNG / BMP <span aria-hidden="true">·</span> Max. 10 MiB</span>
+      <span class="format-note">PNG / BMP <span aria-hidden="true">/</span> Max. 10 MiB</span>
     </div>
 
     <section id="panel-embed" role="tabpanel" aria-labelledby="tab-embed">
-      <form id="embed-form" class="workspace" novalidate>
+      <form id="embed-form" class="workspace" method="post" novalidate>
         <div class="image-area">
           <div class="pane-bar">
             <h2>Imagine</h2>
@@ -71,9 +56,8 @@
               <label class="dropzone" id="embed-dropzone" for="embed-image">
                 <input class="file-input" id="embed-image" type="file" accept="image/png,image/bmp,.png,.bmp" aria-label="Imaginea sursă" aria-describedby="embed-file-help" required>
                 <span class="upload-empty with-demo" id="embed-empty">
-                  <span class="upload-mark"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg></span>
-                  <strong>Trage imaginea aici</strong>
-                  <span class="file-action"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg>Alege fișierul</span>
+                  <strong>Alege un fișier</strong>
+                  <span class="drop-hint">sau trage imaginea aici</span>
                 </span>
                 <span class="upload-preview" id="embed-preview-wrap" hidden>
                   <img id="embed-preview" alt="Imaginea sursă">
@@ -81,7 +65,7 @@
                 </span>
               </label>
               <button class="demo-button" id="embed-demo" type="button">
-                <span class="spinner" hidden></span><span class="button-label">Folosește o imagine de test</span>
+                <span class="spinner" hidden></span><span class="button-label">Încarcă imaginea de test</span>
               </button>
             </div>
             <div class="output-preview" id="embed-output-preview" hidden>
@@ -89,7 +73,7 @@
             </div>
           </div>
           <div class="image-info">
-            <span id="embed-file-help" class="canvas-hint">PNG sau BMP, maximum 10 MiB.</span>
+            <span id="embed-file-help" class="canvas-hint">Fișier sursă · PNG sau BMP</span>
             <div class="file-summary" id="embed-file-summary" hidden>
               <span class="file-name" id="embed-file-name"></span>
               <button class="text-button" type="button" id="remove-embed-image">Elimină</button>
@@ -111,7 +95,7 @@
               <div class="field-heading"><label for="embed-password">Parolă</label><span class="field-meta">Min. 12 caractere</span></div>
               <div class="password-field">
                 <input id="embed-password" name="password" type="password" autocomplete="new-password" placeholder="Alege o parolă" required aria-describedby="password-guidance">
-                <button type="button" class="show-password" data-password-target="embed-password" aria-label="Arată parola de criptare" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button type="button" class="show-password" data-password-target="embed-password" aria-label="Arată parola de criptare" aria-pressed="false"><span class="show-label">Arată</span><span class="hide-label">Ascunde</span></button>
               </div>
               <p class="field-hint" id="password-guidance">Parola nu poate fi recuperată.</p>
             </div>
@@ -119,21 +103,20 @@
             <div class="notice notice-error" id="embed-error" role="alert" hidden></div>
             <button id="embed-submit" class="button button-primary button-wide" type="submit">
               <span class="spinner" hidden></span><span class="button-label">Criptează și ascunde</span>
-              <svg class="icon button-icon" aria-hidden="true"><use href="#i-arrow"/></svg>
             </button>
-            <p id="embed-placeholder" class="field-hint form-footnote">Imaginea rezultată se descarcă în format PNG.</p>
+            <p id="embed-placeholder" class="field-hint form-footnote">Rezultatul se descarcă în format PNG.</p>
 
             <section class="result" id="embed-result" hidden aria-labelledby="embed-result-heading">
-              <h3 id="embed-result-heading">Imagine pregătită</h3>
-              <p class="field-hint">Trimite PNG-ul ca fișier original. Redimensionarea sau conversia poate distruge mesajul.</p>
+              <h3 id="embed-result-heading">PNG pregătit</h3>
+              <p class="field-hint">Păstrează PNG-ul nemodificat. Redimensionarea poate distruge mesajul.</p>
               <div class="result-actions">
-                <a id="download-image" class="button button-outline" download="stegvault-mesaj.png"><svg class="icon" aria-hidden="true"><use href="#i-download"/></svg>Descarcă PNG</a>
+                <a id="download-image" class="button button-outline" download="stegvault-mesaj.png">Descarcă PNG</a>
                 <button id="analyze-button" class="button button-text" type="button"><span class="spinner" hidden></span><span class="button-label">Analizează imaginea</span></button>
               </div>
               <div class="notice notice-error" id="analyze-error" role="alert" hidden></div>
               <div class="analysis-results" id="analysis-results" hidden>
                 <dl class="metrics"><div><dt>PSNR</dt><dd id="metric-psnr">—</dd></div><div><dt>SSIM</dt><dd id="metric-ssim">—</dd></div></dl>
-                <details class="metric-details"><summary>Statistici LSB <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary><p class="field-hint">Metricile descriu fidelitatea imaginii și pot semnala schimbări statistice.</p><pre id="chi-square-output"></pre></details>
+                <details class="metric-details"><summary>Statistici LSB</summary><p class="field-hint">Metricile descriu fidelitatea imaginii și pot semnala schimbări statistice.</p><pre id="chi-square-output"></pre></details>
               </div>
             </section>
           </div>
@@ -142,16 +125,15 @@
     </section>
 
     <section id="panel-extract" role="tabpanel" aria-labelledby="tab-extract" hidden>
-      <form id="extract-form" class="workspace" novalidate>
+      <form id="extract-form" class="workspace" method="post" novalidate>
         <div class="image-area">
           <div class="pane-bar"><h2>Imagine cu mesaj</h2></div>
           <div class="canvas">
             <label class="dropzone" id="extract-dropzone" for="extract-image">
               <input class="file-input" id="extract-image" type="file" accept="image/png,image/bmp,.png,.bmp" aria-label="Imaginea cu mesaj ascuns" aria-describedby="extract-file-help" required>
               <span class="upload-empty" id="extract-empty">
-                <span class="upload-mark"><svg class="icon" aria-hidden="true"><use href="#i-image"/></svg></span>
-                <strong>Trage imaginea aici</strong>
-                <span class="file-action"><svg class="icon" aria-hidden="true"><use href="#i-upload"/></svg>Alege fișierul</span>
+                <strong>Alege un fișier</strong>
+                <span class="drop-hint">sau trage imaginea aici</span>
               </span>
               <span class="upload-preview" id="extract-preview-wrap" hidden>
                 <img id="extract-preview" alt="Imaginea cu mesaj ascuns">
@@ -160,7 +142,7 @@
             </label>
           </div>
           <div class="image-info">
-            <p id="extract-file-help" class="canvas-hint">Folosește imaginea originală, fără redimensionare sau conversie.</p>
+            <p id="extract-file-help" class="canvas-hint">Încarcă fișierul PNG sau BMP nemodificat.</p>
             <div class="file-summary" id="extract-file-summary" hidden>
               <span class="file-name" id="extract-file-name"></span>
               <button class="text-button" type="button" id="remove-extract-image">Elimină</button>
@@ -175,21 +157,20 @@
               <div class="field-heading"><label for="extract-password">Parolă</label></div>
               <div class="password-field">
                 <input id="extract-password" name="password" type="password" autocomplete="off" placeholder="Parola folosită la criptare" required>
-                <button type="button" class="show-password" data-password-target="extract-password" aria-label="Arată parola de decriptare" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-eye"/></svg></button>
+                <button type="button" class="show-password" data-password-target="extract-password" aria-label="Arată parola de decriptare" aria-pressed="false"><span class="show-label">Arată</span><span class="hide-label">Ascunde</span></button>
               </div>
             </div>
             <div class="notice notice-error" id="extract-error" role="alert" hidden></div>
             <button id="extract-submit" class="button button-primary button-wide" type="submit">
               <span class="spinner" hidden></span><span class="button-label">Extrage și decriptează</span>
-              <svg class="icon button-icon" aria-hidden="true"><use href="#i-arrow"/></svg>
             </button>
             <p id="extract-placeholder" class="field-hint form-footnote">Mesajul apare aici după verificarea integrității.</p>
             <section class="result" id="extract-result" hidden aria-labelledby="extract-result-heading">
-              <div class="result-heading"><h3 id="extract-result-heading">Mesaj recuperat</h3><span class="verified">Verificat</span></div>
+              <div class="result-heading"><h3 id="extract-result-heading">Mesaj recuperat</h3></div>
               <pre id="decrypted-message" class="decrypted-message" tabindex="0"></pre>
               <p class="field-hint" id="extracted-byte-count"></p>
               <div class="result-actions">
-                <button class="button button-outline" type="button" id="copy-message"><svg class="icon" aria-hidden="true"><use href="#i-copy"/></svg>Copiază</button>
+                <button class="button button-outline" type="button" id="copy-message">Copiază</button>
                 <button class="button button-text" type="button" id="clear-message">Șterge mesajul</button>
               </div>
               <p class="copy-feedback field-hint" id="copy-feedback" role="status"></p>
@@ -200,9 +181,9 @@
     </section>
 
     <footer class="site-footer">
-      <p><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg> Fișierele și parolele sunt procesate în memorie.</p>
+      <p id="processing-note">Fișierele și parolele sunt procesate în memorie.</p>
       <details class="project-details">
-        <summary>Despre proiect <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+        <summary>Despre proiect</summary>
         <div class="project-content">
           <p>Proiect de securitate informațională, Universitatea Tehnică a Moldovei, grupa SI-252.</p>
           <p>Meriacre Victor, Parfeni Inga și Rudinciuc Victor.</p>

@@ -1,0 +1,16 @@
+{
+  "name": "stegvault",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-netlify.mjs"
+  },
+  "dependencies": {
+    "buffer": "6.0.3",
+    "pngjs": "7.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

@@ -3,11 +3,13 @@
 Aplicație full-stack funcțională pentru proiectul UTM, grupa SI-252.
 Echipă: **Meriacre Victor, Parfeni Inga, Rudinciuc Victor**.
 
+[Deschide StegVault pe Netlify](https://stegvault-si252.netlify.app/).
+
 StegVault criptează text UTF-8 cu AES-256-GCM, derivă cheia prin
 PBKDF2-HMAC-SHA-256 și ascunde pachetul în câte un bit LSB al canalelor RGB.
-Interfața și API-ul rulează împreună, fără servicii externe, conturi sau bază de date.
-Parola și mesajul sunt procesate pe server: pentru lucru la distanță este necesar HTTPS
-și un server în care utilizatorul are încredere.
+Versiunea instalată local rulează interfața și API-ul împreună. API-ul FastAPI
+procesează parola și mesajul în memorie. Versiunea găzduită pe Netlify procesează
+imagini, mesaje și parole în browser.
 
 ## Pasul 1 Structura proiectului
 
@@ -114,7 +116,7 @@ efective sunt consemnate în [`VERIFICARE.md`](docs/VERIFICARE.md).
 ## Pasul 7 Instalare și rulare
 
 Mediu verificat: Python **3.13.7**. Folosiți Python 3.13 și rulați comenzile din
-directorul rădăcină al proiectului. Nu sunt necesare Node.js sau compilarea interfeței.
+directorul rădăcină al proiectului. Modul FastAPI nu necesită Node.js.
 
 macOS / Linux:
 
@@ -147,6 +149,25 @@ Documentația API completă este [aici](docs/API.md).
 Evitați redimensionarea, filtrele și conversia în JPEG: modifică biții care transportă
 mesajul. Salvarea PNG fără schimbarea pixelilor păstrează pachetul. Un câmp de parolă
 greșită și un pachet cu integritate invalidă produc aceeași eroare de autentificare.
+
+## Publicare pe Netlify
+
+Artefactul static se construiește cu Node.js 22 sau mai nou.
+
+```bash
+npm ci
+npm run build
+```
+
+În Netlify se poate importa depozitul GitHub de la rădăcină. Configurația
+`netlify.toml` selectează comanda `npm run build` și directorul `dist`.
+Pentru o publicare manuală, se încarcă directorul `dist` după compilare.
+
+Versiunea statică utilizează Web Crypto pe HTTPS. Un Web Worker decodează
+imaginile, inserează și extrage mesajele și calculează metricile. Profilul
+binar coincide cu cel al API-ului FastAPI, astfel încât imaginile PNG
+rezultate se pot deschide în ambele variante. Decodarea BMP depinde de
+formatele BMP acceptate de browser.
 
 ## Teste și analiza produsului
 

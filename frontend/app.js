@@ -4,6 +4,7 @@
 (() => {
   const MAX_FILE_BYTES = 10 * 1024 * 1024;
   const MAX_PASSWORD_BYTES = 1024;
+  const browserProcessing = document.body.dataset.processing === "browser";
   const EMPTY_CAPACITY = "Alege o imagine pentru a-i verifica capacitatea.";
   const encoder = new TextEncoder();
   const $ = (id) => document.getElementById(id);
@@ -144,10 +145,40 @@
     target.scrollIntoView({ block: "center", behavior: reducedMotion ? "instant" : "smooth" });
   }
 
+  function requestInBrowser(path, form, signal) {
+    if (!window.isSecureContext || !window.crypto?.subtle || !window.Worker) {
+      throw new UserError("Procesarea locală necesită un browser actual și o conexiune HTTPS.");
+    }
+    signal.throwIfAborted();
+    return new Promise((resolve, reject) => {
+      const worker = new Worker("/image-worker.js");
+      const cancel = () => finish(reject, signal.reason);
+      const finish = (callback, value) => {
+        signal.removeEventListener("abort", cancel);
+        worker.terminate();
+        callback(value);
+      };
+      const failure = () => finish(reject, new UserError("Motorul de procesare nu a putut porni. Reîncarcă pagina."));
+      signal.addEventListener("abort", cancel, { once: true });
+      worker.addEventListener("error", failure, { once: true });
+      worker.addEventListener("messageerror", failure, { once: true });
+      worker.addEventListener("message", ({ data }) => {
+        if (data.error) finish(reject, new UserError(data.error));
+        else finish(resolve, data.result);
+      }, { once: true });
+      try {
+        worker.postMessage({ path, fields: Object.fromEntries(form) });
+      } catch {
+        failure();
+      }
+    });
+  }
+
   async function request(path, data, controller, expectImage = false) {
     let timedOut = false;
     const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, 120_000);
     try {
+      if (browserProcessing) return await requestInBrowser(path, data, controller.signal);
       const response = await fetch(path, {
         method: "POST", body: data, signal: controller.signal,
         cache: "no-store", credentials: "same-origin",
@@ -174,6 +205,7 @@
       if (timedOut) throw new UserError("Procesarea a durat prea mult. Încearcă din nou cu o imagine mai mică.");
       if (error.name === "AbortError" || controller.signal.aborted) throw error;
       if (error instanceof UserError) throw error;
+      if (browserProcessing) throw new UserError("Procesarea în browser a eșuat. Încearcă din nou.");
       if (!navigator.onLine) throw new UserError("Ești offline. Verifică rețeaua și încearcă din nou.");
       if (error instanceof TypeError) throw new UserError("Serverul nu răspunde. Verifică dacă aplicația este pornită.");
       throw new UserError("Răspunsul serverului nu a putut fi citit. Încearcă din nou.");
@@ -210,7 +242,7 @@
     $("capacity-description").textContent = overflow ?
       `Ai depășit limita cu ${formatNumber(bytes - capacity)} octeți. Scurtează mesajul sau alege o imagine mai mare.` :
       hasCapacity ? `${formatNumber(capacity - bytes)} octeți rămași.` :
-      "Diacriticele și emoji pot ocupa mai mulți octeți.";
+      "Unele caractere, inclusiv diacriticele, ocupă mai mulți octeți.";
   }
 
   function updatePasswordGuidance() {
@@ -420,7 +452,7 @@
     try {
       const result = await request("/api/v1/extract", data, controller);
       if (operation !== state.extract.operation) return;
-      if (typeof result.message !== "string") throw new UserError("Serverul a returnat un mesaj invalid.");
+      if (typeof result.message !== "string") throw new UserError("Mesajul extras este invalid.");
       $("decrypted-message").textContent = result.message;
       $("extracted-byte-count").textContent = `${formatNumber(byteLength(result.message))} octeți UTF-8 · ${formatNumber(Array.from(result.message).length)} caractere`;
       $("extract-placeholder").hidden = true;
@@ -557,6 +589,9 @@
   document.addEventListener("dragover", (event) => { if (event.dataTransfer?.types?.includes("Files")) event.preventDefault(); });
   document.addEventListener("drop", (event) => { if (event.dataTransfer?.types?.includes("Files")) event.preventDefault(); });
   window.addEventListener("pagehide", () => { clearSession(); clearTimeout(state.toastTimer); });
+  if (browserProcessing) {
+    $("processing-note").textContent = "Imaginile, mesajele și parolele sunt procesate în acest browser.";
+  }
   connectUpload("embed");
   connectUpload("extract");
   $("embed-demo")?.addEventListener("click", () => { void loadDemo(); });
