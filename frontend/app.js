@@ -5,7 +5,6 @@
   const MAX_FILE_BYTES = 10 * 1024 * 1024;
   const MAX_PASSWORD_BYTES = 1024;
   const browserProcessing = document.body.dataset.processing === "browser";
-  const EMPTY_CAPACITY = "Alege o imagine pentru a-i verifica capacitatea.";
   const encoder = new TextEncoder();
   const $ = (id) => document.getElementById(id);
   const formatNumber = (value) => new Intl.NumberFormat("ro-RO").format(value);
@@ -55,7 +54,6 @@
     state.result.original = null;
     setEmbedPreview("original");
     $("embed-result").hidden = true;
-    $("embed-placeholder").hidden = false;
     $("analysis-results").hidden = true;
     $("chi-square-output").textContent = "";
     $("metric-psnr").textContent = "—";
@@ -69,7 +67,6 @@
     $("extracted-byte-count").textContent = "";
     $("copy-feedback").textContent = "";
     $("extract-result").hidden = true;
-    $("extract-placeholder").hidden = false;
   }
 
   function resetPasswordVisibility(id) {
@@ -85,9 +82,7 @@
     button.disabled = busy;
     button.setAttribute("aria-busy", String(busy));
     const spinner = button.querySelector(".spinner");
-    const icon = button.querySelector(".button-icon");
     if (spinner) spinner.hidden = !busy;
-    if (icon) icon.hidden = busy;
     if (label) label.textContent = busy ? busyText : button.dataset.idleLabel;
   }
 
@@ -253,7 +248,7 @@
     const invalid = password.length > 0 && (length < 12 || bytes > MAX_PASSWORD_BYTES);
     guidance.classList.toggle("text-danger", invalid);
     $("embed-password").setAttribute("aria-invalid", String(invalid));
-    if (!password) guidance.textContent = "Alege o frază unică. Parola nu se poate recupera.";
+    if (!password) guidance.textContent = "Alege o frază unică. Parola nu poate fi recuperată.";
     else if (bytes > MAX_PASSWORD_BYTES) guidance.textContent = "Parola depășește limita de 1.024 octeți UTF-8.";
     else if (length < 12) guidance.textContent = `Mai adaugă ${12 - length} ${length === 11 ? "caracter" : "caractere"}.`;
     else if (length < 20) guidance.textContent = "Lungime acceptată. Recomandăm o frază unică de cel puțin 20 de caractere.";
@@ -273,13 +268,13 @@
           !Number.isSafeInteger(result.width) || !Number.isSafeInteger(result.height)) throw new UserError("Serverul a returnat o capacitate invalidă.");
       state.embed.capacity = result;
       $("capacity-summary").textContent = `${formatNumber(result.width)} × ${formatNumber(result.height)} px · ${formatNumber(result.max_payload_bytes)} octeți disponibili`;
-      if (result.max_payload_bytes === 0) showError("embed-error", new UserError("Imaginea este prea mică pentru a ascunde un mesaj."));
+      if (result.max_payload_bytes === 0) showError("embed-file-error", "Imaginea este prea mică pentru a ascunde un mesaj.");
       updateMessageCapacity();
     } catch (error) {
       if (version !== state.embed.version || (controller.signal.aborted && !(error instanceof UserError))) return;
       state.embed.capacity = null;
-      $("capacity-summary").textContent = "Alege din nou imaginea pentru a verifica capacitatea.";
-      showError("embed-error", error);
+      $("capacity-summary").textContent = "";
+      showError("embed-file-error", error);
       updateMessageCapacity();
     } finally {
       if (state.embed.capacityController === controller) state.embed.capacityController = null;
@@ -294,12 +289,13 @@
     item.file = null;
     revokePreview(kind);
     hideError(`${kind}-error`);
+    hideError(`${kind}-file-error`);
     if (kind === "embed") {
       state.embed.capacityController?.abort();
       state.embed.capacityController = null;
       state.embed.capacity = null;
       clearEmbedResult();
-      $("capacity-summary").textContent = EMPTY_CAPACITY;
+      $("capacity-summary").textContent = "";
       updateMessageCapacity();
     } else clearExtractResult();
     if (!file) return;
@@ -317,7 +313,7 @@
     } catch (error) {
       if (version !== item.version) return;
       $(`${kind}-image`).value = "";
-      showError(`${kind}-error`, error);
+      showError(`${kind}-file-error`, error);
     }
   }
 
@@ -327,6 +323,7 @@
     const version = state.embed.version;
     state.embed.demoController = controller;
     hideError("embed-error");
+    hideError("embed-file-error");
     updateDemoButton();
     const timeout = setTimeout(() => controller.abort(), 15_000);
     const isCurrent = () => state.embed.demoController === controller && state.embed.version === version && !state.embed.busy;
@@ -340,7 +337,7 @@
       $("embed-image").value = "";
       await chooseFile("embed", new File([blob], "imagine-demonstrativă.png", { type: "image/png" }));
     } catch {
-      if (isCurrent()) showError("embed-error", "Imaginea demonstrativă nu s-a încărcat. Încearcă din nou sau alege un fișier.");
+      if (isCurrent()) showError("embed-file-error", "Imaginea demonstrativă nu s-a încărcat. Încearcă din nou sau alege un fișier.");
     } finally {
       clearTimeout(timeout);
       if (state.embed.demoController === controller) {
@@ -369,7 +366,7 @@
       input.value = "";
       if (files.length !== 1) {
         if (kind === "embed") cancelDemo();
-        showError(`${kind}-error`, new UserError("Încarcă o singură imagine."));
+        showError(`${kind}-file-error`, "Încarcă o singură imagine.");
         return;
       }
       void chooseFile(kind, files[0]);
@@ -396,6 +393,7 @@
       if (byteLength(message) > state.embed.capacity.max_payload_bytes) throw new UserError("Mesajul depășește capacitatea imaginii. Scurtează-l sau alege o imagine mai mare.");
       validPassword(password, true);
     } catch (error) { showError("embed-error", error); return; }
+    hideError("embed-file-error");
     clearEmbedResult();
     const original = state.embed.file;
     const operation = ++state.embed.operation;
@@ -419,7 +417,6 @@
       const safeStem = original.name.replace(/\.[^.]*$/, "").replace(/[^\p{L}\p{N}_-]+/gu, "-").slice(0, 80) || "imagine";
       $("download-image").download = `${safeStem}-stegvault.png`;
       setEmbedPreview("result");
-      $("embed-placeholder").hidden = true;
       $("embed-result").hidden = false;
       $("embed-password").value = "";
       resetPasswordVisibility("embed-password");
@@ -442,6 +439,7 @@
       if (!state.extract.file) throw new UserError("Încarcă imaginea cu mesaj ascuns.");
       validPassword(password, false);
     } catch (error) { showError("extract-error", error); return; }
+    hideError("extract-file-error");
     const operation = ++state.extract.operation;
     const controller = new AbortController();
     state.extract.controller = controller;
@@ -455,7 +453,6 @@
       if (typeof result.message !== "string") throw new UserError("Mesajul extras este invalid.");
       $("decrypted-message").textContent = result.message;
       $("extracted-byte-count").textContent = `${formatNumber(byteLength(result.message))} octeți UTF-8 · ${formatNumber(Array.from(result.message).length)} caractere`;
-      $("extract-placeholder").hidden = true;
       $("extract-result").hidden = false;
       $("extract-password").value = "";
       resetPasswordVisibility("extract-password");
@@ -568,12 +565,13 @@
       $(`${kind}-form`).reset();
       setFormBusy(kind, false);
       hideError(`${kind}-error`);
+      hideError(`${kind}-file-error`);
       resetPasswordVisibility(`${kind}-password`);
       $(`${kind}-dropzone`).classList.remove("drag-over");
     }
     clearEmbedResult();
     clearExtractResult();
-    $("capacity-summary").textContent = EMPTY_CAPACITY;
+    $("capacity-summary").textContent = "";
     updateMessageCapacity();
     updatePasswordGuidance();
   }

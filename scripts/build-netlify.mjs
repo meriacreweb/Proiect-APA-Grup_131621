@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
@@ -14,6 +14,7 @@ await rm(dist, { recursive: true, force: true });
 await mkdir(dist);
 await Promise.all([
   ...assets.map((name) => copyFile(join(frontend, name), join(dist, name))),
+  cp(join(frontend, "fonts"), join(dist, "fonts"), { recursive: true }),
   writeFile(join(dist, "index.html"), index.replace("<body>", '<body data-processing="browser">')),
   build({
     entryPoints: [join(frontend, "image-worker.js")],
